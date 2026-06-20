@@ -1,0 +1,26 @@
+{
+  "name": "abena",
+  "version": "1.0.0",
+  "description": "On-prem health probe toolkit with Prometheus support",
+  "type": "module",
+  "main": "src/index.mjs",
+  "bin": {
+    "abena": "src/index.mjs"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "test": "echo \"No tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "js-yaml": "^4.1.0",
+    "prom-client": "^15.1.3",
+    "express": "^4.21.2"
+  }
+}

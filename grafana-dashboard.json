@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "abena-health-probes",
+    "title": "Abena - On-Prem Health Probes",
+    "tags": ["abena", "monitoring", "prometheus"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "type": "stat",
+        "title": "Overall Health",
+        "targets": [{ "expr": "sum(abena_probes_success) / sum(abena_probes_total) * 100", "legendFormat": "Success Rate" }],
+        "fieldConfig": { "defaults": { "unit": "percent", "color": { "mode": "threshold" } } }
+      },
+      {
+        "type": "timeseries",
+        "title": "Probe Duration (P95)",
+        "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(abena_probe_duration_seconds_bucket[5m])) by (le))", "legendFormat": "P95" }]
+      },
+      {
+        "type": "stat",
+        "title": "Total Probes",
+        "targets": [{ "expr": "sum(abena_probes_total)" }]
+      },
+      {
+        "type": "table",
+        "title": "Recent Probes by Target",
+        "targets": [{ "expr": "abena_probes_total", "format": "table" }]
+      }
+    ],
+    "refresh": "30s",
+    "time": { "from": "now-1h", "to": "now" }
+  },
+  "meta": {
+    "version": "1.0.0",
+    "createdBy": "Abena"
+  }
+}

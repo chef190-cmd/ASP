@@ -1,0 +1,47 @@
+# tls-alerts.yml - Prometheus alerting rules for TLS certificates
+groups:
+  - name: tls-certificate-alerts
+    rules:
+      # Warning: Expiring in 30 days
+      - alert: TLSCertificateExpiringSoon
+        expr: |
+          probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+          and probe_ssl_earliest_cert_expiry - time() > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS Certificate expiring soon"
+          description: "Certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}."
+
+      # Critical: Expiring in 7 days
+      - alert: TLSCertificateExpiringVerySoon
+        expr: |
+          probe_ssl_earliest_cert_expiry - time() < 86400 * 7
+          and probe_ssl_earliest_cert_expiry - time() > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TLS Certificate expiring VERY soon!"
+          description: "Certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}. Renew immediately."
+
+      # Critical: Already expired
+      - alert: TLSCertificateExpired
+        expr: probe_ssl_earliest_cert_expiry - time() <= 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TLS Certificate has EXPIRED"
+          description: "Certificate for {{ $labels.instance }} is no longer valid!"
+
+      # Probe failures
+      - alert: AbenaProbeFailure
+        expr: abena_probes_success < abena_probes_total
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Abena probe failures detected"
+          description: "{{ $value }} probe(s) are failing."

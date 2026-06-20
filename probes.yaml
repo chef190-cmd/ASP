@@ -1,0 +1,60 @@
+# probes.yaml - Advanced configuration for Abena
+timeout: 8000
+retries: 2
+parallel: true
+json: false
+
+# Global defaults
+module: http
+insecure: false
+
+targets:
+  # HTTP/HTTPS Health Checks
+  - target: https://example.com
+    module: http
+    name: "Example.com Production"
+    expected_status: 200
+    timeout: 10000
+
+  - target: https://httpbin.org/status/200
+    module: http
+    name: "HTTP Test Endpoint"
+
+  # Internal service with custom headers
+  - target: https://internal-api.company.local/health
+    module: http
+    headers:
+      Authorization: "Bearer ${{INTERNAL_TOKEN}}"
+      X-Custom-Header: "abena-probe"
+    timeout: 5000
+
+  # TCP Probes
+  - target: db.internal.company.local:5432
+    module: tcp
+    name: "PostgreSQL Database"
+    timeout: 3000
+
+  - target: redis.internal.company.local:6379
+    module: tcp
+    name: "Redis Cache"
+
+  # ICMP Probes
+  - target: 10.0.0.1
+    module: icmp
+    name: "Core Router"
+
+  - target: 8.8.8.8
+    module: icmp
+    name: "Google DNS (ICMP)"
+
+  # DNS Probes
+  - target: 8.8.8.8
+    module: dns
+    name: "DNS Resolution Test"
+    dns_query: "example.com"
+    dns_type: "A"
+
+# Prometheus / Monitoring settings
+metrics:
+  enabled: true
+  port: 9090
