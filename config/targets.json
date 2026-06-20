@@ -1,0 +1,88 @@
+{
+  "name": "Abena Advanced Targets Configuration",
+  "version": "1.1.0",
+  "description": "Production-grade health probe targets with rich configuration",
+  "global": {
+    "timeout": 8000,
+    "retries": 3,
+    "parallel": true,
+    "defaultModule": "http",
+    "insecure": false
+  },
+  "targets": [
+    {
+      "name": "Production Frontend",
+      "target": "https://example.com",
+      "module": "http",
+      "expectedStatus": [200, 204],
+      "timeout": 10000,
+      "headers": {
+        "User-Agent": "Abena-Health-Probe/1.0"
+      },
+      "tags": ["web", "production", "customer-facing"],
+      "alertOnFailure": true,
+      "certExpiryWarningDays": 30
+    },
+    {
+      "name": "Internal API Gateway",
+      "target": "https://api.internal.company.local/healthz",
+      "module": "http",
+      "expectedStatus": 200,
+      "headers": {
+        "Authorization": "Bearer ${{VAULT_API_TOKEN}}",
+        "X-Request-ID": "abena-probe"
+      },
+      "timeout": 6000,
+      "tags": ["api", "internal"],
+      "bodyContains": "healthy"
+    },
+    {
+      "name": "PostgreSQL Primary",
+      "target": "postgres.db.internal:5432",
+      "module": "tcp",
+      "timeout": 4000,
+      "tags": ["database", "critical"]
+    },
+    {
+      "name": "Redis Cluster",
+      "target": "redis.internal:6379",
+      "module": "tcp",
+      "timeout": 3000,
+      "tags": ["cache", "high-availability"]
+    },
+    {
+      "name": "Core Network Gateway",
+      "target": "10.0.0.1",
+      "module": "icmp",
+      "timeout": 2000,
+      "tags": ["network", "infrastructure"]
+    },
+    {
+      "name": "DNS Resolution Test",
+      "target": "8.8.8.8",
+      "module": "dns",
+      "dnsQuery": "internal.company.local",
+      "dnsType": "A",
+      "timeout": 5000,
+      "tags": ["dns"]
+    },
+    {
+      "name": "Self-signed Internal Service",
+      "target": "https://internal-service.company.local:8443/status",
+      "module": "http",
+      "insecure": true,
+      "expectedStatus": 200,
+      "tags": ["internal", "self-signed"]
+    }
+  ],
+  "metrics": {
+    "enabled": true,
+    "port": 9090,
+    "pushGateway": "http://pushgateway:9091"
+  },
+  "alerting": {
+    "enabled": true,
+    "channels": ["slack", "pagerduty"],
+    "minSuccessRate": 95
+  }
+}
